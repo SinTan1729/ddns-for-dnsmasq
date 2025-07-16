@@ -2,5 +2,6 @@
 ip-header: "s"
 port: 4187
 hosts:
-    - host: server
+    server:
+      host: server
       api-key: exampleapikey

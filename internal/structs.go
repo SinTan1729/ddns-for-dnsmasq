@@ -10,18 +10,18 @@ type httpError struct {
 	Reason string `json:"reason,omitempty"`
 }
 
-type HostEntry struct {
+type HostConfig struct {
 	Host   string `yaml:"host"`
 	APIKey string `yaml:"api-key"`
 }
 
-type AppData struct {
-	IPHeader string      `yaml:"ip-header"`
-	Port     int         `yaml:"port"`
-	Hosts    []HostEntry `yaml:"hosts"`
+type Config struct {
+	IPHeader string                `yaml:"ip-header"`
+	Port     int                   `yaml:"port"`
+	Hosts    map[string]HostConfig `yaml:"hosts"`
 }
 
-type updatePayload struct {
+type hostEntry struct {
 	Host string `json:"host"`
 	IP   string `json:"ip"`
 }

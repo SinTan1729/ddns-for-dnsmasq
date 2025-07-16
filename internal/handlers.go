@@ -10,9 +10,9 @@ import (
 func WhoAmI(w http.ResponseWriter, req *http.Request) {
 	var status int
 	var body []byte
-	appData := req.Context().Value("appData").(*AppData)
+	config := req.Context().Value("config").(*Config)
 
-	ip, port, err := getClientInfo(req, appData.IPHeader)
+	ip, port, err := getClientInfo(req, config.IPHeader)
 	if err == nil {
 		status = http.StatusOK
 		body, _ = json.Marshal(ipInfo{IP: ip, Port: port})
@@ -34,10 +34,10 @@ func Update(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintln(w, string(body))
 	}()
 
-	appData := req.Context().Value("appData").(*AppData)
+	config := req.Context().Value("config").(*Config)
 	apiKey := req.Header.Get("X-API-Key")
 
-	var data updatePayload
+	var data hostEntry
 	err := json.NewDecoder(req.Body).Decode(&data)
 	if err != nil {
 		status = http.StatusBadRequest
@@ -45,32 +45,31 @@ func Update(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	for _, entry := range appData.Hosts {
-		if entry.Host == data.Host {
-			if entry.APIKey == apiKey {
-				ip := data.IP
-				if ip == "" {
-					reqIP, _, err := getClientInfo(req, appData.IPHeader)
-					if err != nil {
-						status = http.StatusInternalServerError
-						body, _ = json.Marshal(newHTTPError(err.Error()))
-						return
-					}
-					ip = reqIP
-				}
-				if net.ParseIP(ip) == nil {
-					status = http.StatusBadRequest
-					body, _ = json.Marshal(newHTTPError("Invalid IP was provided."))
+	entry, ok := config.Hosts[data.Host]
+	if ok {
+		if entry.APIKey == apiKey {
+			ip := data.IP
+			if ip == "" {
+				reqIP, _, err := getClientInfo(req, config.IPHeader)
+				if err != nil {
+					status = http.StatusInternalServerError
+					body, _ = json.Marshal(newHTTPError(err.Error()))
 					return
 				}
-				status = http.StatusOK
-				body, _ = json.Marshal(updatePayload{Host: entry.Host, IP: ip})
-			} else {
-				status = http.StatusUnauthorized
-				body, _ = json.Marshal(newHTTPError("Wrong API key was provided."))
+				ip = reqIP
 			}
-			return
+			if net.ParseIP(ip) == nil {
+				status = http.StatusBadRequest
+				body, _ = json.Marshal(newHTTPError("Invalid IP was provided."))
+				return
+			}
+			status = http.StatusOK
+			body, _ = json.Marshal(hostEntry{Host: entry.Host, IP: ip})
+		} else {
+			status = http.StatusUnauthorized
+			body, _ = json.Marshal(newHTTPError("Wrong API key was provided."))
 		}
+		return
 	}
 
 	status = http.StatusNotFound

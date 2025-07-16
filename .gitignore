@@ -12,6 +12,9 @@ ddns-for-dnsmasq
 # Test binary, built with `go test -c`
 *.test
 
+# For testing
+hostfile
+
 # Code coverage profiles and other test artifacts
 *.out
 coverage.*
