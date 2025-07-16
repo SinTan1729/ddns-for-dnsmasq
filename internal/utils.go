@@ -31,3 +31,11 @@ func newHTTPError(msg string) httpError {
 		Reason: msg,
 	}
 }
+
+func validAuth(req *http.Request, c *Config, data *hostEntry) (HostConfig, bool) {
+	entry, ok := c.Hosts[data.Host]
+	if ok && entry.APIKey == req.Header.Get("X-API-Key") {
+		return entry, true
+	}
+	return entry, false
+}

@@ -29,14 +29,12 @@ func Update(w http.ResponseWriter, req *http.Request) {
 	var status int
 	var body []byte
 	defer func() {
-		status = 200
 		w.WriteHeader(status)
 		fmt.Fprintln(w, string(body))
 	}()
 
 	config := req.Context().Value("config").(*Config)
 	hostfile := req.Context().Value("hostfile").(*Hostfile)
-	apiKey := req.Header.Get("X-API-Key")
 
 	var data hostEntry
 	err := json.NewDecoder(req.Body).Decode(&data)
@@ -46,34 +44,63 @@ func Update(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	entry, ok := config.Hosts[data.Host]
+	entry, ok := validAuth(req, config, &data)
 	if ok {
-		if entry.APIKey == apiKey {
-			ip := data.IP
-			if ip == "" {
-				reqIP, _, err := getClientInfo(req, config.IPHeader)
-				if err != nil {
-					status = http.StatusInternalServerError
-					body, _ = json.Marshal(newHTTPError(err.Error()))
-					return
-				}
-				ip = reqIP
-			}
-			if net.ParseIP(ip) == nil {
-				status = http.StatusBadRequest
-				body, _ = json.Marshal(newHTTPError("Invalid IP was provided."))
+		ip := data.IP
+		if ip == "" {
+			reqIP, _, err := getClientInfo(req, config.IPHeader)
+			if err != nil {
+				status = http.StatusInternalServerError
+				body, _ = json.Marshal(newHTTPError(err.Error()))
 				return
 			}
-			hostfile.update(entry.Host, ip)
-			status = http.StatusOK
-			body, _ = json.Marshal(hostEntry{Host: entry.Host, IP: ip})
-		} else {
-			status = http.StatusUnauthorized
-			body, _ = json.Marshal(newHTTPError("Wrong API key was provided."))
+			ip = reqIP
 		}
+		if net.ParseIP(ip) == nil {
+			status = http.StatusBadRequest
+			body, _ = json.Marshal(newHTTPError("Invalid IP was provided."))
+			return
+		}
+		hostfile.update(entry.Host, ip)
+		status = http.StatusOK
+		body, _ = json.Marshal(hostEntry{Host: entry.Host, IP: ip})
+	} else {
+		status = http.StatusUnauthorized
+		body, _ = json.Marshal(newHTTPError("Wrong API key was provided."))
+	}
+
+}
+
+func GetInfo(w http.ResponseWriter, req *http.Request) {
+	var status int
+	var body []byte
+	defer func() {
+		w.WriteHeader(status)
+		fmt.Fprintln(w, string(body))
+	}()
+	config := req.Context().Value("config").(*Config)
+	hostfile := req.Context().Value("hostfile").(*Hostfile)
+
+	var data hostEntry
+	err := json.NewDecoder(req.Body).Decode(&data)
+	if err != nil {
+		status = http.StatusBadRequest
+		body, _ = json.Marshal(newHTTPError("The request was malformed."))
 		return
 	}
 
-	status = http.StatusNotFound
-	body, _ = json.Marshal(newHTTPError("Payload didn't match server config."))
+	entry, ok := validAuth(req, config, &data)
+	if ok {
+		host, ok := hostfile.hosts[entry.Host]
+		if ok {
+			status = http.StatusOK
+			body, _ = json.Marshal(host)
+		} else {
+			status = http.StatusNotFound
+			body, _ = json.Marshal(newHTTPError("There's no entry for this host."))
+		}
+	} else {
+		status = http.StatusUnauthorized
+		body, _ = json.Marshal(newHTTPError("Wrong API key was provided."))
+	}
 }

@@ -41,6 +41,12 @@ func main() {
 		r = r.WithContext(ctx)
 		internal.Update(w, r)
 	})
+	http.HandleFunc("POST /getinfo", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "config", &config)
+		ctx = context.WithValue(ctx, "hostfile", &hostfile)
+		r = r.WithContext(ctx)
+		internal.GetInfo(w, r)
+	})
 
 	if config.IPHeader != "" {
 		log.Printf("Using header %v for reading IP.\n", config.IPHeader)
