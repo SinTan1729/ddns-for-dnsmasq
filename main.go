@@ -3,46 +3,42 @@ package main
 import (
 	"context"
 	"fmt"
-	"net"
+	"log"
 	"net/http"
+	"os"
+
+	yaml "github.com/goccy/go-yaml"
 )
 
 type appData struct {
-	ipHeader string
-}
-
-func whoami(w http.ResponseWriter, req *http.Request) {
-	ctx := req.Context()
-	h := ctx.Value("ipHeader").(string)
-	var ipString string
-
-	if h == "" {
-		ipString = req.RemoteAddr
-	} else {
-		ipString = req.Header.Get(h)
-	}
-	ip, port, err := net.SplitHostPort(ipString)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintln(w, "Error getting your IP!")
-		return
-	}
-	if net.ParseIP(ip) == nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(w, "Got an invalid IP!")
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Here's what I can see.\nIP: %v, port: %v", ip, port)
+	IPHeader string `yaml:"ip-header"`
+	Port     int    `yaml:"port"`
 }
 
 func main() {
-	app := &appData{ipHeader: ""}
+	log.SetFlags(0)
+	app := appData{IPHeader: "", Port: 4187}
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath != "" {
+		configFile, err := os.Open(configPath)
+		if err == nil {
+			yaml.NewDecoder(configFile).Decode(&app)
+		} else {
+			log.Println("Not config found at provided path. Using default values.")
+		}
+		configFile.Close()
+	}
+
 	http.HandleFunc("/whoami", func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), "ipHeader", app.ipHeader)
+		ctx := context.WithValue(r.Context(), "app", &app)
 		r = r.WithContext(ctx)
 		whoami(w, r)
 	})
 
-	http.ListenAndServe(":4187", nil)
+	if app.IPHeader != "" {
+		log.Printf("Using header %v for reading IP.\n", app.IPHeader)
+	}
+	portString := fmt.Sprintf(":%v", app.Port)
+	log.Println("Server listening at", portString)
+	http.ListenAndServe(portString, nil)
 }

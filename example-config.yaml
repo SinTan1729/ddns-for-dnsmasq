@@ -1,0 +1,3 @@
+# Config file for DDNS for Dnsmasq
+ip-header: ""
+port: 4187
