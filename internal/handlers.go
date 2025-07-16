@@ -35,6 +35,7 @@ func Update(w http.ResponseWriter, req *http.Request) {
 	}()
 
 	config := req.Context().Value("config").(*Config)
+	hostfile := req.Context().Value("hostfile").(*Hostfile)
 	apiKey := req.Header.Get("X-API-Key")
 
 	var data hostEntry
@@ -63,6 +64,7 @@ func Update(w http.ResponseWriter, req *http.Request) {
 				body, _ = json.Marshal(newHTTPError("Invalid IP was provided."))
 				return
 			}
+			hostfile.update(entry.Host, ip)
 			status = http.StatusOK
 			body, _ = json.Marshal(hostEntry{Host: entry.Host, IP: ip})
 		} else {
