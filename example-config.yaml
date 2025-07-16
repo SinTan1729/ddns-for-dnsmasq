@@ -1,3 +1,6 @@
 # Config file for DDNS for Dnsmasq
-ip-header: ""
+ip-header: "s"
 port: 4187
+hosts:
+    - host: server
+      api-key: exampleapikey

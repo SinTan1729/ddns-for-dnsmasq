@@ -7,38 +7,42 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/SinTan1729/ddns-for-dnsmasq/internal"
 	yaml "github.com/goccy/go-yaml"
 )
 
-type appData struct {
-	IPHeader string `yaml:"ip-header"`
-	Port     int    `yaml:"port"`
-}
-
 func main() {
 	log.SetFlags(0)
-	app := appData{IPHeader: "", Port: 4187}
+	appData := internal.AppData{IPHeader: "", Port: 4187}
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath != "" {
 		configFile, err := os.Open(configPath)
 		if err == nil {
-			yaml.NewDecoder(configFile).Decode(&app)
+			err = yaml.NewDecoder(configFile).Decode(&appData)
+			if err != nil {
+				log.Fatalln("Config file is malformed. Exiting.")
+			}
 		} else {
 			log.Println("Not config found at provided path. Using default values.")
 		}
 		configFile.Close()
 	}
 
-	http.HandleFunc("/whoami", func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), "app", &app)
+	http.HandleFunc("GET /whoami", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "appData", &appData)
 		r = r.WithContext(ctx)
-		whoami(w, r)
+		internal.WhoAmI(w, r)
+	})
+	http.HandleFunc("PUT /update", func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "appData", &appData)
+		r = r.WithContext(ctx)
+		internal.Update(w, r)
 	})
 
-	if app.IPHeader != "" {
-		log.Printf("Using header %v for reading IP.\n", app.IPHeader)
+	if appData.IPHeader != "" {
+		log.Printf("Using header %v for reading IP.\n", appData.IPHeader)
 	}
-	portString := fmt.Sprintf(":%v", app.Port)
+	portString := fmt.Sprintf(":%v", appData.Port)
 	log.Println("Server listening at", portString)
 	http.ListenAndServe(portString, nil)
 }
