@@ -1,8 +1,17 @@
-# Config file for DDNS for Dnsmasq
+## Config file for DDNS for Dnsmasq
+
+# Custom ip-header is needed if using any reverse-proxy. If no header is found, it falls back to the visible IP.
 ip-header: "X-Forwarded-For"
+# If you change the port, make sure that you update your docker compose file accordingly.
 port: 4187
 hosts:
-    server-example:
-      api-key: "$argon2id$v=19$m=65536,t=3,p=1$MTIzM2FzZDEyMTIzMzEx$J/65KbfsmUJHJOWhyTa2sznIjXJocuPkIWP7Q7Othrc"
-    vps-example:
-      api-key: "$argon2id$v=19$m=65536,t=3,p=1$MTIzM2FzZDEyMTIzMzEx$+PrMkT/ZRQhnporMAkXy5d9a0hbpNSoKEszpbiByEq8"
+    # The hostname is server1
+    server1:
+      # Plailntext is password-for-server1
+      # Generated using: echo -n "password-for-server1" | argon2 "salt-for-server1" -id -t 3 -m 16 -l 32 -e
+      api-key: "$argon2id$v=19$m=65536,t=3,p=1$c2FsdC1mb3Itc2VydmVyMQ$AtENXlABaf+vEd4I3o0e98n2NzCsf4Y5bySsw6fmJRI"
+    # The hostname is server2
+    server2:
+      # Plailntext is password-for-server2
+      # Generated using: echo -n "password-for-server2" | argon2 "salt-for-server2" -id -t 3 -m 16 -l 32 -e
+      api-key: "$argon2id$v=19$m=65536,t=3,p=1$c2FsdC1mb3Itc2VydmVyMg$voD7YlEOf5s4f94pPAYc0RjDsO340EPsBYyKVCAoeYE"

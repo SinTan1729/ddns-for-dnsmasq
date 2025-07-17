@@ -10,7 +10,9 @@ services:
         ports:
             - 4187:4187
         environment:
+            # Path to the config file
             - CONFIG_PATH="/var/config.yaml"
+            # Path to the hostfile
             - HOSTFILE_PATH="/var/hostfile"
         volumes:
             - "./example_config.yaml:/var/config.yaml:ro"
