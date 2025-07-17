@@ -45,7 +45,7 @@ func (h *Hostfile) update(name string, ip string) {
 		}
 	}
 	w.Flush()
-	log.Printf("IP for %v was updated to %v", host.Host, host.IP)
+	log.Printf("IP for %v was updated to %v", name, ip)
 }
 
 func (h *Hostfile) Init(s string) {
