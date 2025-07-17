@@ -50,14 +50,14 @@ It will simply reply with the detected IP address. Use it like this.
 curl <your-server>/whoami
 ```
 
-## `getinfo`
+## `/getinfo`
 It will reply with the info stored about a specific host. Use it like this.
 ```bash
 curl -X POST -H 'X-API-Key: <api-key>' -d '{"host":"<hostname>"}' <your-server>/getinfo
 ```
 The reply will look exactly like that of `/update`.
 
-## `version`
+## `/version`
 It will simply reply with the server version. Use it like this.
 ```bash
 curl <your-server>/version
