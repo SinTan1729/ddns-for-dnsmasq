@@ -32,7 +32,7 @@ By default, it tries to detect your IP and use that.
 The reply will be in `json` of either of two types.
 ```json
 {
-  "hsot": "<hostname>",
+  "host": "<hostname>",
   "ip": "<used-ip>"
 }
 ```
