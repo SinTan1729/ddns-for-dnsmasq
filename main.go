@@ -9,27 +9,14 @@ import (
 	"strings"
 
 	"github.com/SinTan1729/ddns-for-dnsmasq/internal"
-	yaml "github.com/goccy/go-yaml"
 )
 
 func main() {
 	log.SetFlags(0)
-	config := internal.Config{IPHeader: "", Port: 4187}
-	configPath := strings.Trim(os.Getenv("CONFIG_PATH"), `"`)
-	if configPath != "" {
-		configFile, err := os.Open(configPath)
-		if err == nil {
-			err = yaml.NewDecoder(configFile).Decode(&config)
-			if err != nil {
-				log.Fatalln("Config file is malformed. Exiting.")
-			}
-		} else {
-			log.Println("Not config found at provided path. Using default values.")
-		}
-		configFile.Close()
-	}
 	var hostfile internal.Hostfile
 	hostfile.Init(strings.Trim(os.Getenv("HOSTFILE_PATH"), `"`))
+	var config internal.Config
+	config.Init()
 
 	http.HandleFunc("GET /version", internal.Version)
 	http.HandleFunc("GET /whoami", func(w http.ResponseWriter, r *http.Request) {

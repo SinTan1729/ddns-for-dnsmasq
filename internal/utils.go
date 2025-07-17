@@ -5,10 +5,37 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/alexedwards/argon2id"
+	yaml "github.com/goccy/go-yaml"
 )
+
+func (c *Config) Init() {
+	*c = Config{IPHeader: "", Port: 4187}
+	configPath := strings.Trim(os.Getenv("CONFIG_PATH"), `"`)
+	if configPath != "" {
+		configFile, err := os.Open(configPath)
+		if err == nil {
+			err = yaml.NewDecoder(configFile).Decode(c)
+			if err != nil {
+				log.Fatalln("Config file is malformed. Exiting.")
+			}
+		} else {
+			log.Println("Not config found at provided path. Using default values.")
+		}
+		configFile.Close()
+	}
+	for name, host := range c.Hosts {
+		hash := host.APIKey
+		_, _, _, err := argon2id.DecodeHash(hash)
+		if err != nil {
+			log.Printf("The API key hash for %v seems to be invalid.\n", name)
+			log.Fatalf("%v\nPlease fix it. Exiting for now.\n", err)
+		}
+	}
+}
 
 func getClientInfo(req *http.Request, h string) (string, error) {
 	var err error
