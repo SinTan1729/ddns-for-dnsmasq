@@ -3,6 +3,6 @@ ip-header: "X-Forwarded-For"
 port: 4187
 hosts:
     server-example:
-      api-key: exampleapikey
+      api-key: "$argon2id$v=19$m=65536,t=3,p=1$MTIzM2FzZDEyMTIzMzEx$J/65KbfsmUJHJOWhyTa2sznIjXJocuPkIWP7Q7Othrc"
     vps-example:
-      api-key: dsd
+      api-key: "$argon2id$v=19$m=65536,t=3,p=1$MTIzM2FzZDEyMTIzMzEx$+PrMkT/ZRQhnporMAkXy5d9a0hbpNSoKEszpbiByEq8"

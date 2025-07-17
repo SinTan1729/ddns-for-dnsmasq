@@ -2,9 +2,12 @@ package internal
 
 import (
 	"errors"
+	"log"
 	"net"
 	"net/http"
 	"strings"
+
+	"github.com/alexedwards/argon2id"
 )
 
 func getClientInfo(req *http.Request, h string) (string, error) {
@@ -38,8 +41,15 @@ func newHTTPError(msg string) httpError {
 
 func validAuth(req *http.Request, c *Config, data *hostEntry) bool {
 	entry, ok := c.Hosts[data.Host]
-	if ok && entry.APIKey == req.Header.Get("X-API-Key") {
-		return true
+	if ok {
+		match, errValidate := argon2id.ComparePasswordAndHash(req.Header.Get("X-API-Key"), entry.APIKey)
+		switch errValidate {
+		case nil:
+			return match
+		default:
+			log.Printf("Got the following error while processing the API key hash for %v:\n", data.Host)
+			log.Fatalf("%v\nPlease fix it. Exiting for now.\n", errValidate)
+		}
 	}
 	return false
 }
