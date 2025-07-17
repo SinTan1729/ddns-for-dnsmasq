@@ -2,9 +2,7 @@
 ip-header: "X-Forwarded-For"
 port: 4187
 hosts:
-    server:
-      host: server
+    server-example:
       api-key: exampleapikey
-    vps:
-      host: vps
+    vps-example:
       api-key: dsd

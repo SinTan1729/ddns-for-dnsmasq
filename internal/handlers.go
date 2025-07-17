@@ -51,7 +51,7 @@ func Update(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	entry, ok := validAuth(req, config, &data)
+	ok := validAuth(req, config, &data)
 	if ok {
 		ip := data.IP
 		if ip == "" {
@@ -68,9 +68,9 @@ func Update(w http.ResponseWriter, req *http.Request) {
 			body, _ = json.Marshal(newHTTPError("Invalid IP was provided."))
 			return
 		}
-		hostfile.update(entry.Host, ip)
+		hostfile.update(data.Host, ip)
 		status = http.StatusOK
-		body, _ = json.Marshal(hostEntry{Host: entry.Host, IP: ip})
+		body, _ = json.Marshal(hostEntry{Host: data.Host, IP: ip})
 	} else {
 		status = http.StatusUnauthorized
 		body, _ = json.Marshal(newHTTPError("Wrong API key was provided."))
@@ -96,9 +96,9 @@ func GetInfo(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	entry, ok := validAuth(req, config, &data)
+	ok := validAuth(req, config, &data)
 	if ok {
-		host, ok := hostfile.hosts[entry.Host]
+		host, ok := hostfile.hosts[data.Host]
 		if ok {
 			status = http.StatusOK
 			body, _ = json.Marshal(host)

@@ -17,6 +17,7 @@ func getClientInfo(req *http.Request, h string) (string, error) {
 	hostport := strings.TrimSpace(strings.SplitN(ipList, ",", 2)[0])
 	ip, _, err := net.SplitHostPort(hostport)
 	if err != nil {
+		// This is needed since reverse proxies don't set port
 		ip = hostport
 		err = nil
 	}
@@ -35,10 +36,10 @@ func newHTTPError(msg string) httpError {
 	}
 }
 
-func validAuth(req *http.Request, c *Config, data *hostEntry) (HostConfig, bool) {
+func validAuth(req *http.Request, c *Config, data *hostEntry) bool {
 	entry, ok := c.Hosts[data.Host]
 	if ok && entry.APIKey == req.Header.Get("X-API-Key") {
-		return entry, true
+		return true
 	}
-	return entry, false
+	return false
 }

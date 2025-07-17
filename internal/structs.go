@@ -6,7 +6,6 @@ type httpError struct {
 }
 
 type HostConfig struct {
-	Host   string `yaml:"host"`
 	APIKey string `yaml:"api-key"`
 }
 
