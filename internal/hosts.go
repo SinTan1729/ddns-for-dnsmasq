@@ -10,11 +10,6 @@ import (
 	"github.com/wasilibs/go-re2"
 )
 
-type Hostfile struct {
-	path  string
-	hosts map[string]hostEntry
-}
-
 func (h *Hostfile) update(name string, ip string) {
 	host, ok := h.hosts[name]
 	if ok {

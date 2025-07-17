@@ -19,3 +19,8 @@ type hostEntry struct {
 	Host string `json:"host"`
 	IP   string `json:"ip"`
 }
+
+type Hostfile struct {
+	path  string
+	hosts map[string]hostEntry
+}
