@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const version = "0.1.0"
+const version = "0.1.1"
 
 func Version(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
