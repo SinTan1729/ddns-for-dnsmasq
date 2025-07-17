@@ -5,3 +5,6 @@ hosts:
     server:
       host: server
       api-key: exampleapikey
+    vps:
+      host: vps
+      api-key: dsd

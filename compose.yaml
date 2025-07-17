@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2025 Sayantan Santra <sayantan.santra689@gmail.com>
+# SPDX-License-Identifier: GPL-3.0
+
+services:
+    ddnsmasq:
+        image: ghcr.io/sintan1729/ddnsmasq:latest
+        restart: unless-stopped
+        container_name: ddnsmasq
+        tty: true
+        ports:
+            - 4187:4187
+        environment:
+            - CONFIG_PATH="/var/config.yaml"
+            - HOSTFILE_PATH="/var/hostfile"
+        volumes:
+            - "./example_config.yaml:/var/config.yaml:ro"
+            - "./hostfile:/var/hostfile"

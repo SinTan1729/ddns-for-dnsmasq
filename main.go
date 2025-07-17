@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/SinTan1729/ddns-for-dnsmasq/internal"
 	yaml "github.com/goccy/go-yaml"
@@ -14,7 +15,7 @@ import (
 func main() {
 	log.SetFlags(0)
 	config := internal.Config{IPHeader: "", Port: 4187}
-	configPath := os.Getenv("CONFIG_PATH")
+	configPath := strings.Trim(os.Getenv("CONFIG_PATH"), `"`)
 	if configPath != "" {
 		configFile, err := os.Open(configPath)
 		if err == nil {
@@ -28,7 +29,7 @@ func main() {
 		configFile.Close()
 	}
 	var hostfile internal.Hostfile
-	hostfile.Init(os.Getenv("HOSTFILE_PATH"))
+	hostfile.Init(strings.Trim(os.Getenv("HOSTFILE_PATH"), `"`))
 
 	http.HandleFunc("GET /whoami", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "config", &config)
