@@ -41,6 +41,7 @@ or
 {
   "error": true,
   "reason": "<some-reason>"
+}
 ```
 
 ## `/whoami`
