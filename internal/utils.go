@@ -34,6 +34,7 @@ func (c *Config) Init() {
 			log.Printf("The API key hash for %v seems to be invalid.\n", name)
 			log.Fatalf("%v\nPlease fix it. Exiting for now.\n", err)
 		}
+		log.Printf("Config for %v was loaded successfully.\n", name)
 	}
 }
 

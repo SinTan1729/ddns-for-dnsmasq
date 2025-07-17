@@ -64,8 +64,10 @@ func (h *Hostfile) Init(s string) {
 		}
 		matches := pattern.FindStringSubmatch(line)
 		if len(matches) > 0 {
-			entry := hostEntry{Host: matches[2], IP: matches[1]}
-			hosts[matches[2]] = entry
+			name, ip := matches[2], matches[1]
+			entry := hostEntry{Host: name, IP: ip}
+			hosts[name] = entry
+			log.Printf("Detected host %v in hostfile.\n", name)
 		} else {
 			log.Fatalln("Unsupported hostfile.")
 		}
