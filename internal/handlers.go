@@ -7,15 +7,22 @@ import (
 	"net/http"
 )
 
+const version = "0.1.0"
+
+func Version(w http.ResponseWriter, req *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "DDNS for Dnsmasq v%v\n", version)
+}
+
 func WhoAmI(w http.ResponseWriter, req *http.Request) {
 	var status int
 	var body []byte
 	config := req.Context().Value("config").(*Config)
 
-	ip, port, err := getClientInfo(req, config.IPHeader)
+	ip, err := getClientInfo(req, config.IPHeader)
 	if err == nil {
 		status = http.StatusOK
-		body, _ = json.Marshal(ipInfo{IP: ip, Port: port})
+		body = []byte(ip)
 	} else {
 		status = http.StatusInternalServerError
 		body, _ = json.Marshal(newHTTPError(err.Error()))
@@ -48,7 +55,7 @@ func Update(w http.ResponseWriter, req *http.Request) {
 	if ok {
 		ip := data.IP
 		if ip == "" {
-			reqIP, _, err := getClientInfo(req, config.IPHeader)
+			reqIP, err := getClientInfo(req, config.IPHeader)
 			if err != nil {
 				status = http.StatusInternalServerError
 				body, _ = json.Marshal(newHTTPError(err.Error()))

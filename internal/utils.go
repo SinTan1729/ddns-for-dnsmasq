@@ -4,25 +4,28 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"strings"
 )
 
-func getClientInfo(req *http.Request, h string) (string, string, error) {
-	var errIP error
+func getClientInfo(req *http.Request, h string) (string, error) {
+	var err error
 
-	ipString := req.Header.Get(h)
-	if ipString == "" {
-		ipString = req.RemoteAddr
+	ipList := req.Header.Get(h)
+	if ipList == "" {
+		ipList = req.RemoteAddr
 	}
-
-	ip, port, err := net.SplitHostPort(ipString)
+	hostport := strings.TrimSpace(strings.SplitN(ipList, ",", 2)[0])
+	ip, _, err := net.SplitHostPort(hostport)
 	if err != nil {
-		errIP = errors.New("Error reading your IP!")
-	}
-	if net.ParseIP(ip) == nil {
-		errIP = errors.New("Request has an invalid IP!")
+		ip = hostport
+		err = nil
 	}
 
-	return ip, port, errIP
+	if net.ParseIP(ip) == nil {
+		err = errors.New("Request has an invalid IP!")
+	}
+
+	return ip, err
 }
 
 func newHTTPError(msg string) httpError {

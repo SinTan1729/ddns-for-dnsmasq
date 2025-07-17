@@ -31,6 +31,7 @@ func main() {
 	var hostfile internal.Hostfile
 	hostfile.Init(strings.Trim(os.Getenv("HOSTFILE_PATH"), `"`))
 
+	http.HandleFunc("GET /version", internal.Version)
 	http.HandleFunc("GET /whoami", func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), "config", &config)
 		r = r.WithContext(ctx)

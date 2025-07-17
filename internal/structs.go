@@ -1,10 +1,5 @@
 package internal
 
-type ipInfo struct {
-	IP   string `json:"ip,omitempty"`
-	Port string `json:"port,omitempty"`
-}
-
 type httpError struct {
 	Error  bool   `json:"error"`
 	Reason string `json:"reason,omitempty"`
