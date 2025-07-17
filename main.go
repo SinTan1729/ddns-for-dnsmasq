@@ -38,7 +38,7 @@ func main() {
 	})
 
 	if config.IPHeader != "" {
-		log.Printf(`Using header "%v" for reading IP.\n`, config.IPHeader)
+		log.Printf("Using header \"%v\" for reading IP.\n", config.IPHeader)
 	}
 	portString := fmt.Sprintf(":%v", config.Port)
 	log.Println("Server listening at", portString)
