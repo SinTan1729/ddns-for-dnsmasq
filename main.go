@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-	log.SetFlags(0)
 	var hostfile internal.Hostfile
 	hostfile.Init(strings.Trim(os.Getenv("HOSTFILE_PATH"), `"`))
 	var config internal.Config
