@@ -1,6 +1,6 @@
 module github.com/SinTan1729/ddns-for-dnsmasq
 
-go 1.24.5
+go 1.25.0
 
 require (
 	github.com/alexedwards/argon2id v1.0.0
@@ -11,6 +11,6 @@ require (
 require (
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/wasilibs/wazero-helpers v0.0.0-20240620070341-3dff1577cd52 // indirect
-	golang.org/x/crypto v0.45.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/crypto v0.52.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 )
